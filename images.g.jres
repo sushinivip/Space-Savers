@@ -11,6 +11,14 @@
     },
     "image3": {
         "data": "hwQNAA0AAAAAAADd3QAAAAAA2+7eCwAAAADbu94LAAAA0Ovu7r0AAACw7u7evgAAANDr7tu+AAAAsLvu3r0NAACw2+3ruwAAC7vQvd4NAACwCwC9DQAAALALAAAAAAAAALsAAAAAAAAAsAAAAAAAAA==",
+<<<<<<< HEAD
+=======
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "Trashalso2"
+    },
+    "image5": {
+        "data": "hwQNAAsAAACImIiYiAgAAIiYiJiICAAAmZmZmZkJAACImIiYiAgAAJmZmZmZCQAAiJiImIgIAACZmZmZmQkAAIiYiJiICAAAmZmZmZkJAACImIiYiAgAAJmZmZmZCQAAiJiImIgIAACImIiYiAgAAA==",
+>>>>>>> master
         "mimeType": "image/x-mkcd-f4",
         "displayName": "Trashalso2"
     },
