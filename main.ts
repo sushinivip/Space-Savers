@@ -1,6 +1,11 @@
 namespace SpriteKind {
     export const Shoot = SpriteKind.create()
     export const Protect = SpriteKind.create()
+    export const enemyshoot = SpriteKind.create()
+    export const UFO = SpriteKind.create()
+}
+function UfoDestroyed (Sprite2: Sprite) {
+    sprites.destroy(Sprite2)
 }
 function randomTrashpositiosning () {
     trashSpawner = randint(1, 8)
@@ -41,16 +46,37 @@ sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Shoot, function (sprite, oth
     info.changeScoreBy(100)
     sprite.destroy(effects.fire, 500)
 })
+sprites.onOverlap(SpriteKind.UFO, SpriteKind.Player, function (sprite, otherSprite) {
+    SpaceSaverLives += -1
+    sprite.destroy(effects.fire, 500)
+    UfoDestroyed(arrayUFO[arrayUFO.indexOf(sprite) + 1])
+})
 function doTrashSpawnPositionY1 () {
     return arrayTrashPositionsY1[randint(0, arrayTrashPositionsY1.length - 1)]
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.enemyshoot, function (sprite, otherSprite) {
+    SpaceSaverLives += -1
+    pause(1000)
+})
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Projectile, function (sprite, otherSprite) {
     otherSprite.destroy(effects.fire, 500)
     SpaceSaverLives += -1
+    pause(1000)
 })
+sprites.onOverlap(SpriteKind.UFO, SpriteKind.Projectile, function (sprite, otherSprite) {
+    sprite.destroy()
+    otherSprite.destroy(effects.fire, 500)
+    UfoDestroyed(arrayUFO[arrayUFO.indexOf(sprite) + 1])
+})
+function UfoRayPositionY () {
+    return UFO.y + 12
+}
 function doTrashSpawnpositionY2 () {
     return arrayTrashPositionsY2[randint(0, arrayTrashPositionsY2.length - 1)]
 }
+sprites.onOverlap(SpriteKind.Projectile, SpriteKind.enemyshoot, function (sprite, otherSprite) {
+    sprite.destroy(effects.fire, 500)
+})
 sprites.onOverlap(SpriteKind.Protect, SpriteKind.Projectile, function (sprite, otherSprite) {
     sprite.destroy()
     otherSprite.destroy(effects.fire, 500)
@@ -58,6 +84,11 @@ sprites.onOverlap(SpriteKind.Protect, SpriteKind.Projectile, function (sprite, o
 function doTrashSpawnpositionX2 () {
     return arrayTrashPositionsX2[randint(0, arrayTrashPositionsX2.length - 1)]
 }
+sprites.onOverlap(SpriteKind.UFO, SpriteKind.Shoot, function (sprite, otherSprite) {
+    sprite.destroy()
+    otherSprite.destroy(effects.fire, 500)
+    UfoDestroyed(arrayUFO[arrayUFO.indexOf(sprite) + 1])
+})
 function getShipImg (orientation: number, livesLeft: number, pressed: number) {
     if (livesLeft > 0) {
         return ships[2 * (2 - livesLeft) + pressed][orientation - 1]
@@ -99,9 +130,12 @@ function getRandomElement (arrayTrashes: Image[]) {
 }
 let buttonPressed = 0
 let lastOrientation = 0
+let UfoSide = 0
 let spriteTrash: Sprite = null
 let trashSpawner = 0
 let ships: Image[][] = []
+let arrayUFO: Sprite[] = []
+let UFO: Sprite = null
 let arrayTrashPositionsY2: number[] = []
 let arrayTrashPositionsX2: number[] = []
 let arrayTrashPositionsY1: number[] = []
@@ -281,6 +315,7 @@ Shield.setPosition(200, 210)
 let SpaceSaverLives = 2
 let ShieldOn = 0
 let shieldDestroyed = false
+let Difficultycurve = 1000
 arrayTrashes = [
 assets.image`Trashalso1`,
 assets.image`Trash1`,
@@ -301,6 +336,111 @@ img`
     . f b b b b d d d c . . . . . . 
     . . c b d d d c c . . . . . . . 
     . . . c c c c . . . . . . . . . 
+    . . . . . . . . . . . . . . . . 
+    . . . . . . . . . . . . . . . . 
+    `,
+img`
+    . . . . . . . . . . . . . . . . 
+    . . . . . . . . . . . . . . . . 
+    . . . . . . . . . . . . . . . . 
+    . . . . . . . . . . . . . . . . 
+    . . . . . . . . . . . . . . . . 
+    . . . . . . . . b b . . . . . . 
+    . . . . . . . c b b b . . . . . 
+    . . . . . . c b b b b b . . . . 
+    . . . . . c b b b b b b . . . . 
+    . . . . c b b b b b d . . . . . 
+    . . . c b b b b b d . . . . . . 
+    . . . b b b b b d . . . . . . . 
+    . . . . b b b d . . . . . . . . 
+    . . . . . b d . . . . . . . . . 
+    . . . . . . . . . . . . . . . . 
+    . . . . . . . . . . . . . . . . 
+    `,
+img`
+    ....................
+    ....................
+    ....................
+    ....................
+    ....................
+    ........82..........
+    .....88828..........
+    .8188182188.........
+    .8118121812.........
+    .8181181128.........
+    .818218121..........
+    .812818281..........
+    ..8288288...........
+    ...822888...........
+    ....................
+    ....................
+    ....................
+    ....................
+    ....................
+    ....................
+    `,
+img`
+    . . c . . . . . . . . . . 
+    b . b c . . . . . . . . . 
+    d b b b c . . . . . . . . 
+    . d b b b c . . . . . . . 
+    . . d b b b . . . . . . . 
+    . . b b b b c . . . . . . 
+    . . b b b b b c c c c . . 
+    . . d b b b b b b b b c . 
+    . . . d d d b b b b b b . 
+    . . . . . . b b b b b b . 
+    . . . . . . d d b b b b . 
+    . . . . . . . . d d . . . 
+    . . . . . . . . . . . . . 
+    `,
+img`
+    . . . . . . . . . . . . . . . . 
+    . . . . . . . . . d d d d . . . 
+    . . . . . . . . d e e e d d . . 
+    . . . . . . . b e e e e e d . . 
+    . . . . . . b e e e e e e d . . 
+    . . . . . b e e e e e e e d . . 
+    . . . . b e e e e e e e c . . . 
+    . . . b e e e e e e e c . . . . 
+    . . b e e e e e e e e c . . . . 
+    . e d d d d d e e e c . . . . . 
+    . d b b b c c d e c c . . . . . 
+    . d b b c c c d e c . . . . . . 
+    . d b b c c c d e c . . . . . . 
+    . d b c c c c d c . . . . . . . 
+    . d c c c c c d c . . . . . . . 
+    . . d d d d d c . . . . . . . . 
+    `,
+img`
+    . . . . . . b b b . . . 
+    . . . . . c b b b b . . 
+    . . . . . . c b b b d . 
+    . . . . . . . c b b b d 
+    . . . . . . . c b b b d 
+    . . . . . . . c b b b d 
+    . . . . . . c b b b b d 
+    . . . . . c b b b b d . 
+    . . c c c b b b b b d . 
+    c c b b b b b b d d . . 
+    . b b b b b b d . . . . 
+    . . d d d d d . . . . . 
+    `,
+img`
+    . . . . . 8 8 8 . . . . . . . . 
+    . . . . 8 8 8 8 8 . . . . . . . 
+    . . . 8 8 9 9 8 8 8 8 . . . . . 
+    . . 8 8 8 8 9 9 8 8 8 8 . . . . 
+    . 8 8 9 9 8 8 9 9 9 8 8 8 8 . . 
+    8 8 8 8 9 9 9 8 8 9 9 8 8 8 8 . 
+    8 9 9 8 8 9 9 9 8 8 9 9 9 8 8 8 
+    8 8 9 9 9 8 8 9 9 9 8 8 9 9 8 8 
+    . 8 8 8 9 9 8 8 9 9 9 8 8 8 8 . 
+    . . . 8 8 9 9 9 8 8 9 9 8 8 . . 
+    . . . . 8 8 8 9 9 8 8 8 8 . . . 
+    . . . . . 8 8 8 9 9 8 8 . . . . 
+    . . . . . . 8 8 8 8 8 . . . . . 
+    . . . . . . . 8 8 8 . . . . . . 
     . . . . . . . . . . . . . . . . 
     . . . . . . . . . . . . . . . . 
     `
@@ -387,6 +527,36 @@ let spriteShoot1 = sprites.create(img`
     . . . . . . . . . . . . . . . . 
     . . . . . . . . . . . . . . . . 
     `, SpriteKind.Shoot)
+UFO = sprites.create(img`
+    . . . . . . c c c c . . . . . . 
+    . . . . . c 7 7 7 7 c . . . . . 
+    . . . . c 7 7 7 7 7 7 c . . . . 
+    . . . c 7 7 7 7 7 7 7 7 c . . . 
+    . . c c 7 7 7 7 7 7 7 9 c c . . 
+    . c 6 6 c 7 7 7 7 9 9 c 6 6 c . 
+    c 6 6 6 6 c c c c c c 6 6 6 6 c 
+    c 6 6 6 6 6 c 6 6 c 6 6 6 6 6 c 
+    c 6 6 6 6 c 6 6 6 6 c 6 6 6 6 c 
+    . c 6 6 c 6 6 6 6 6 6 c 6 6 c . 
+    . . c c 6 6 6 6 6 6 6 6 c c . . 
+    . c . . c c c c c c c c . . c . 
+    `, SpriteKind.Protect)
+let Uforay = sprites.create(img`
+    . 7 7 7 7 7 7 7 7 . 
+    7 . . . . . . . . 7 
+    . 7 7 7 7 7 7 7 7 . 
+    . . . . . . . . . . 
+    . . 7 7 7 7 7 7 . . 
+    . 7 . . . . . . 7 . 
+    . . 7 7 7 7 7 7 . . 
+    . . . . . . . . . . 
+    . . . 7 7 7 7 . . . 
+    . . 7 . . . . 7 . . 
+    . . . 7 7 7 7 . . . 
+    `, SpriteKind.enemyshoot)
+arrayUFO = []
+UFO.setPosition(-80, -100)
+Uforay.setPosition(-80, -100)
 spriteShoot2.setPosition(-70, -70)
 spriteShoot1.setPosition(-70, -70)
 let projectileOverlap1 = 0
@@ -736,31 +906,101 @@ img`
 ]
 ]
 randomTrashpositiosning()
-forever(function () {
-    if (SpaceSaver_00037.y > 120) {
-        SpaceSaver_00037.y = 0
+game.onUpdateInterval(5000, function () {
+    if (Math.percentChance(50)) {
+        UfoSide = randint(1, 2)
+        UFO = sprites.create(img`
+            . . . . . . c c c c . . . . . . 
+            . . . . . c 7 7 7 7 c . . . . . 
+            . . . . c 7 7 7 7 7 7 c . . . . 
+            . . . c 7 7 7 7 7 7 7 7 c . . . 
+            . . c c 7 7 7 7 7 7 7 9 c c . . 
+            . c 6 6 c 7 7 7 7 9 9 c 6 6 c . 
+            c 6 6 6 6 c c c c c c 6 6 6 6 c 
+            c 6 6 6 6 6 c 6 6 c 6 6 6 6 6 c 
+            c 6 6 6 6 c 6 6 6 6 c 6 6 6 6 c 
+            . c 6 6 c 6 6 6 6 6 6 c 6 6 c . 
+            . . c c 6 6 6 6 6 6 6 6 c c . . 
+            . c . . c c c c c c c c . . c . 
+            `, SpriteKind.UFO)
+        Uforay = sprites.create(img`
+            . 7 7 7 7 7 7 7 7 . 
+            7 . . . . . . . . 7 
+            . 7 7 7 7 7 7 7 7 . 
+            . . . . . . . . . . 
+            . . 7 7 7 7 7 7 . . 
+            . 7 . . . . . . 7 . 
+            . . 7 7 7 7 7 7 . . 
+            . . . . . . . . . . 
+            . . . 7 7 7 7 . . . 
+            . . 7 . . . . 7 . . 
+            . . . 7 7 7 7 . . . 
+            `, SpriteKind.enemyshoot)
+        if (UfoSide == 2) {
+            UFO.setVelocity(-10, 0)
+            Uforay.setVelocity(-10, 0)
+            UFO.setPosition(160, randint(6, 150))
+        } else {
+            UFO.setVelocity(10, 0)
+            Uforay.setVelocity(10, 0)
+            UFO.setPosition(0, randint(6, 150))
+        }
+        Uforay.setPosition(UFO.x - 1, UfoRayPositionY())
+        arrayUFO.push(UFO)
+        arrayUFO.push(Uforay)
     }
 })
-forever(function () {
-    if (SpaceSaver_00037.x > 160) {
-        SpaceSaver_00037.x = 0
+game.onUpdateInterval(5000, function () {
+    if (Difficultycurve > 120) {
+        Difficultycurve += -100
     }
 })
-forever(function () {
-    if (SpaceSaver_00037.y < 0) {
-        SpaceSaver_00037.y = 120
-    }
-})
-forever(function () {
-    if (SpaceSaver_00037.x < 0) {
-        SpaceSaver_00037.x = 160
-    }
-})
-game.onUpdateInterval(1000, function () {
+game.onUpdateInterval(Difficultycurve, function () {
     randomTrashpositiosning()
 })
 forever(function () {
+    characterAnimations.loopFrames(
+    Uforay,
+    [img`
+        . 7 7 7 7 7 7 7 7 7 7 . 
+        7 . . . . . . . . . . 7 
+        . 7 7 7 7 7 7 7 7 7 7 . 
+        . . . . . . . . . . . . 
+        . . 7 7 7 7 7 7 7 7 . . 
+        . 7 . . . . . . . . 7 . 
+        . . 7 7 7 7 7 7 7 7 . . 
+        . . . . . . . . . . . . 
+        . . . 7 7 7 7 7 7 . . . 
+        . . 7 . . . . . . 7 . . 
+        . . . 7 7 7 7 7 7 . . . 
+        . . . . . . . . . . . . 
+        . . . . 7 7 7 7 . . . . 
+        . . . 7 . . . . 7 . . . 
+        . . . . 7 7 7 7 . . . . 
+        `,img`
+        . . . . . . . . . . . . 
+        . . . . . . . . . . . . 
+        . . 7 7 7 7 7 7 7 7 . . 
+        . 7 . . . . . . . . 7 . 
+        . . 7 7 7 7 7 7 7 7 . . 
+        . . . . . . . . . . . . 
+        . . . 7 7 7 7 7 7 . . . 
+        . . 7 . . . . . . 7 . . 
+        . . . 7 7 7 7 7 7 . . . 
+        . . . . . . . . . . . . 
+        . . . . 7 7 7 7 . . . . 
+        . . . 7 . . . . 7 . . . 
+        . . . . 7 7 7 7 . . . . 
+        . . . . . . . . . . . . 
+        . . . . . 7 7 . . . . . 
+        `],
+    500,
+    characterAnimations.rule(Predicate.Moving)
+    )
+})
+forever(function () {
     if (controller.A.isPressed()) {
+        music.playSoundEffect(music.createSoundEffect(WaveShape.Sine, 5000, 0, 255, 48, 450, SoundExpressionEffect.None, InterpolationCurve.Linear), SoundExpressionPlayMode.InBackground)
         if (lastOrientation == 1) {
             spriteShoot2 = sprites.createProjectileFromSprite(img`
                 . . . . . . . . . . . . . . . . 
@@ -927,6 +1167,20 @@ forever(function () {
     }
 })
 forever(function () {
+    if (SpaceSaver_00037.y > 120) {
+        SpaceSaver_00037.y = 0
+    }
+    if (SpaceSaver_00037.x > 160) {
+        SpaceSaver_00037.x = 0
+    }
+    if (SpaceSaver_00037.y < 0) {
+        SpaceSaver_00037.y = 120
+    }
+    if (SpaceSaver_00037.x < 0) {
+        SpaceSaver_00037.x = 160
+    }
+})
+forever(function () {
     if (controller.B.isPressed()) {
         Shield.setPosition(SpaceSaver_00037.x, SpaceSaver_00037.y)
         ShieldOn = 1
@@ -952,9 +1206,6 @@ forever(function () {
     if (ShieldOn == 1) {
         controller.moveSprite(SpaceSaver_00037, 30, 30)
     }
-})
-forever(function () {
-	
 })
 forever(function () {
     buttonPressed = 1

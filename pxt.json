@@ -1,5 +1,5 @@
 {
-    "name": "Save Space",
+    "name": "Space-Savers",
     "description": "",
     "dependencies": {
         "device": "*",
@@ -7,7 +7,8 @@
         "arcade-background-scroll": "github:microsoft/arcade-background-scroll#6cfbf925b9a4d5ddf3e1078e6cf6ca6a1aebb301",
         "arcade-text": "github:microsoft/arcade-text#v1.3.0",
         "animation": "*",
-        "controller": "*"
+        "controller": "*",
+        "Color Fading": "github:jwunderl/pxt-color#v0.2.2"
     },
     "files": [
         "main.blocks",
@@ -26,7 +27,7 @@
         "branch": "v1.8.23",
         "tag": "v1.8.23",
         "commits": "https://github.com/microsoft/pxt-arcade/commits/9c2cb5aa7c70a9b9cbfa1b3520ca036d82ba8483",
-        "target": "1.11.37",
+        "target": "1.12.26",
         "pxt": "7.4.27",
         "targetId": "arcade"
     },
